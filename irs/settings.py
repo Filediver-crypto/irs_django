@@ -26,7 +26,10 @@ SECRET_KEY = 'django-insecure-=p)*hn1vh=kauokmd(eui0p6+*3y55tv4td*grm$=5^lod!7d(
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    "localhost"
+    "localhost",
+    "127.0.0.1",
+    
+
 ]
 
 
@@ -124,3 +127,5 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL = 'bookingsystem.CustomUser'

@@ -19,5 +19,6 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('booking/', include('bookingsystem.urls')),
+    path('', include('bookingsystem.urls')),  # This makes your app URLs available at the root
 ]
+
