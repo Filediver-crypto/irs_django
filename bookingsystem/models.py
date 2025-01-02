@@ -27,15 +27,27 @@ class CustomUser(AbstractUser):
         # Format: USER001, USER002, etc.
         return f'USER{next_number:03d}'
 
+class Room(models.Model):
+    name = models.CharField(max_length=100)  # Name of the room
+    size = models.IntegerField()  # Maximum number of people
+    isworkroom = models.BooleanField(default=False)
+    utility = models.TextField(blank=True, null=True)  # Optional description
+
+
+    def __str__(self):
+        return f"{self.name} - {self.size} - {self.isworkroom} - {self.utility}"
+
 class Booking(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     date = models.DateField()
     time_slot = models.CharField(max_length=10)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, default=1)
     room_type = models.CharField(max_length=20)
     building = models.CharField(max_length=50)
     group_size = models.IntegerField()
     purpose = models.CharField(max_length=50)
 
     def __str__(self):
-        return f"{self.room_type} - {self.date} - {self.time_slot}"
+        return f"{self.room_type} - {self.room.name} - {self.date} - {self.time_slot}"
 
+    

@@ -1,8 +1,8 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 from .forms import CustomUserCreationForm, CustomAuthenticationForm
-from .models import Booking
+from .models import Booking, Room
 
 def login_register(request):
     return render(request, 'auth/login_register.html')
@@ -62,3 +62,7 @@ def dashboard(request):
 def my_bookings(request):
     user_bookings = Booking.objects.filter(user=request.user)
     return render(request, 'my_bookings.html', {'bookings': user_bookings})
+
+@login_required
+def roomplan(request):   
+    return render(request, 'roomplan_detail.html')

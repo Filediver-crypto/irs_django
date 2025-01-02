@@ -10,4 +10,5 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
     path('booking/', views.bookingsystem, name='bookingsystem'),
     path('my-bookings/', views.my_bookings, name='my_bookings'),
+    path('roomplan/', views.roomplan, name='roomplan'),
 ]

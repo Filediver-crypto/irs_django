@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Booking, CustomUser
+from .models import Booking, CustomUser, Room
 
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
@@ -14,4 +14,6 @@ class CustomUserAdmin(admin.ModelAdmin):
     list_filter = ('is_professor',)
     search_fields = ('username', 'user_id', 'user_email')
 
-
+@admin.register(Room)
+class RoomAdmin(admin.ModelAdmin):
+    search_fields = ('name', 'size')

@@ -11,10 +11,10 @@
             <div class="bookings-list">
                 {% for booking in bookings %}
                 <div class="booking-card">
-                    <h3>{{ booking.room_type }}</h3>
-                    <p><strong>Date:</strong> {{ booking.date }}</p>
+                    <h3>{{ booking.date }}</h3>                   
                     <p><strong>Time:</strong> {{ booking.time_slot }}</p>
                     <p><strong>Building:</strong> {{ booking.building }}</p>
+                    <p><strong>Room Type:</strong> {{ booking.room_type }}</p>
                     <p><strong>Purpose:</strong> {{ booking.purpose }}</p>
                 </div>
                 {% endfor %}
