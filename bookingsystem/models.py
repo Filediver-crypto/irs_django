@@ -40,7 +40,8 @@ class Room(models.Model):
 class Booking(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     date = models.DateField()
-    time_slot = models.CharField(max_length=10)
+    start_time = models.TimeField()  # New field for start time
+    end_time = models.TimeField()    # New field for end time
     room = models.ForeignKey(Room, on_delete=models.CASCADE, default=1)
     room_type = models.CharField(max_length=20)
     building = models.CharField(max_length=50)
@@ -48,6 +49,6 @@ class Booking(models.Model):
     purpose = models.CharField(max_length=50)
 
     def __str__(self):
-        return f"{self.room_type} - {self.room.name} - {self.date} - {self.time_slot}"
+        return f"{self.room_type} - {self.room.name} - {self.date} - {self.start_time} - {self.end_time}"
 
     

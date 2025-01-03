@@ -2,6 +2,17 @@
 <html>
 <head>
     <title>IRS - My Bookings</title>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar/index.global.min.js'></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const calendarEl = document.getElementById('calendar');
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth', // Added a comma here
+                
+            });
+            calendar.render();
+        });
+    </script>
 </head>
 
 <div class="dashboard-container">
@@ -15,9 +26,11 @@
             </form>
         </div>
     </header>
+
     
 
 <body>
+    
     <div class="bookings-container">
         <h1>My Bookings</h1>
         
@@ -26,7 +39,7 @@
                 {% for booking in bookings %}
                 <div class="booking-card">
                     <h3>{{ booking.date }}</h3>                   
-                    <p><strong>Time:</strong> {{ booking.time_slot }}</p>
+                    <p><strong>Time:</strong> {{ booking.start_time }} - {{ booking.end_time }}</p>
                     <p><strong>Building:</strong> {{ booking.building }}</p>
                     <p><strong>Room Type:</strong> {{ booking.room_type }}</p>
                     <p><strong>Purpose:</strong> {{ booking.purpose }}</p>
@@ -36,6 +49,8 @@
         {% else %}
             <p class="no-bookings">You haven't made any bookings yet.</p>
         {% endif %}
+
+        <div id='calendar'></div>  
 
         <div class="navigation-buttons">
             <a href="{% url 'dashboard' %}" class="nav-button">Back to Dashboard</a>
