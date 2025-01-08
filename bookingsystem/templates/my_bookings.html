@@ -7,7 +7,22 @@
         document.addEventListener('DOMContentLoaded', function() {
             const calendarEl = document.getElementById('calendar');
             const calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth', // Added a comma here
+                initialView: 'dayGridMonth',
+                events : [
+                    {title: "All Day Math",
+                        start: "2025-01-02"
+                    },
+                    {title: 'Meeting',
+                    start: '2025-01-12T10:30:00',
+                    end: '2025-01-12T12:30:00'
+                    },
+                ],
+                headerToolbar : {
+                    left: "prev, next" ,
+                    center: "title" ,
+                    right: "dayGridMonth, timeGridWeek, listDay"
+
+                }
                 
             });
             calendar.render();
@@ -49,7 +64,7 @@
         {% else %}
             <p class="no-bookings">You haven't made any bookings yet.</p>
         {% endif %}
-
+<br>            
         <div id='calendar'></div>  
 
         <div class="navigation-buttons">

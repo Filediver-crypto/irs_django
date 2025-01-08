@@ -25,13 +25,14 @@ class CustomUser(AbstractUser):
             next_number = 1
             
         # Format: USER001, USER002, etc.
-        return f'USER{next_number:03d}'
+        return f'{next_number:03d}'
 
 class Room(models.Model):
     name = models.CharField(max_length=100)  # Name of the room
     size = models.IntegerField()  # Maximum number of people
     isworkroom = models.BooleanField(default=False)
     utility = models.TextField(blank=True, null=True)  # Optional description
+    building = models.TextField(blank=True, null=True)
 
 
     def __str__(self):
@@ -52,3 +53,11 @@ class Booking(models.Model):
         return f"{self.room_type} - {self.room.name} - {self.date} - {self.start_time} - {self.end_time}"
 
     
+class Course(models.Model):
+    name = models.CharField(max_length=100) 
+    dozent = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    students = models.ManyToManyField(CustomUser, related_name='courses')
+    
+
+    def __str__(self):
+        return f"{self.name} - {self.dozent} - {self.students}"
