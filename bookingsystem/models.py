@@ -32,8 +32,14 @@ class Room(models.Model):
     size = models.IntegerField()  # Maximum number of people
     isworkroom = models.BooleanField(default=False)
     utility = models.TextField(blank=True, null=True)  # Optional description
+    #BUILDING_CHOICES = [
+    #    ('MAIN', 'Main Building'),
+    #    ('SCIENCE', 'Science Building'),
+    #    ('ARTS', 'Arts Building'),
+    #    ('LIBRARY', 'Library'),
+    #]
     building = models.TextField(blank=True, null=True)
-
+                                #max_length=20, choices=BUILDING_CHOICES, default='A')
 
     def __str__(self):
         return f"{self.name} - {self.size} - {self.isworkroom} - {self.utility}"
@@ -48,6 +54,9 @@ class Booking(models.Model):
     building = models.CharField(max_length=50)
     group_size = models.IntegerField()
     purpose = models.CharField(max_length=50)
+    title = f"{room.name} ({purpose})"
+    start = f"{date}T{start_time}"
+    end = f"{date}T{end_time}"
 
     def __str__(self):
         return f"{self.room_type} - {self.room.name} - {self.date} - {self.start_time} - {self.end_time}"
@@ -58,6 +67,7 @@ class Course(models.Model):
     dozent = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     students = models.ManyToManyField(CustomUser, related_name='courses')
     
-
+    
     def __str__(self):
         return f"{self.name} - {self.dozent} - {self.students}"
+    

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Booking, CustomUser, Room
+from .models import Booking, CustomUser, Room, Course
 
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
@@ -16,4 +16,10 @@ class CustomUserAdmin(admin.ModelAdmin):
 
 @admin.register(Room)
 class RoomAdmin(admin.ModelAdmin):
-    search_fields = ('name', 'size')
+    list_display = ('name', 'size', 'building', 'isworkroom')
+    search_fields = ('name', 'size', "building")
+
+@admin.register(Course)
+class CourseAdmin(admin.ModelAdmin):
+    list_display = ('name', 'dozent')
+    search_fields = ('name', 'dozent')
