@@ -9,7 +9,8 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(next_page='login_register'), name='logout'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('booking/', views.bookingsystem, name='bookingsystem'),
-    path('my-bookings/', views.my_bookings, name='my_bookings'),
-    path('roomplan/', views.roomplan, name='roomplan'),
-    path('api/my-bookings/', views.user_bookings_api, name='user_bookings_api'),
+    path('my-bookings/', views.my_bookings, name='my_bookings'),    
+    path('user_booking-data/', views.user_booking_data, name='user_booking-data'),
+    path('room_plans/', views.room_plans, name='room_plans'),
+    path('room_booking_data/', views.room_booking_data, name='room_booking_data'),
 ]

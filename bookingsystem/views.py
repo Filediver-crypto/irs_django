@@ -87,36 +87,74 @@ def dashboard(request):
 
 #MY BOOKINGS
 
+
 @login_required
 def my_bookings(request):
-    user_bookings = Booking.objects.filter(user=request.user)
-    
+
+    user_bookings = Booking.objects.filter(user=request.user).order_by('date', 'start_time')
     return render(request, 'my_bookings.html', {'bookings': user_bookings})
 
 
 @login_required
-def user_bookings_api(request):
-    user = request.user
-    bookings = Booking.objects.filter(user=user)
-    events = [
-        {
-            "id": b.id,
-            "calendarId": "1",
-            "title": f"Booking: {b.room.name}",
-            "category": "time",
-            "start": b.start_date.isoformat(),
-            "end": b.end_date.isoformat(),
-        }
-        for b in bookings
-    ]
+def user_booking_data(request):
+    # Provide JSON data for FullCalendar
+    user_bookings = Booking.objects.filter(user=request.user)
+
+    events = []
+    for booking in user_bookings:
+        events.append({
+            "id": booking.id,
+            "title": f"{booking.room_type} ({booking.purpose})",
+            "start": f"{booking.date}T{booking.start_time}",
+            "end": f"{booking.date}T{booking.end_time}",
+            "allDay": False,
+        })
+
     return JsonResponse(events, safe=False)
+
 
 
 #ROOMPLAN
 
 @login_required
-def roomplan(request):   
-    return render(request, 'roomplan_detail.html')
+def room_plans(request):
+    # Get all rooms for the dropdown menu
+    rooms = Room.objects.all()
+
+    # Get the selected room from the request (default to the first room)
+    selected_room_id = request.GET.get('room_id', rooms.first().id if rooms else None)
+
+    # Pass the rooms and selected room to the template
+    context = {
+        'rooms': rooms,
+        'selected_room_id': int(selected_room_id) if selected_room_id else None,
+    }
+    return render(request, 'room_plans.html', context)
+
+
+@login_required
+def room_booking_data(request):
+    # Get the room ID from the request parameters
+    room_id = request.GET.get('room_id')
+
+    # Fetch all bookings for the selected room
+    if room_id:
+        bookings = Booking.objects.filter(room_id=room_id)
+    else:
+        bookings = []
+
+    # Format data for FullCalendar
+    events = []
+    for booking in bookings:
+        events.append({
+            "id": booking.id,
+            "title": f"{booking.room_type} ({booking.purpose})",
+            "start": f"{booking.date}T{booking.start_time}",
+            "end": f"{booking.date}T{booking.end_time}",
+            "allDay": False,
+        })
+
+    return JsonResponse(events, safe=False)
 
 
 

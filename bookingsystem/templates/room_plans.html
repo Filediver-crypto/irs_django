@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>IRS - Roomplans</title>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar/index.global.min.js'></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                headerToolbar : {
+                    left: "prev, next" ,
+                    center: "title" ,
+                    right: "dayGridMonth, timeGridWeek, listDay"
+
+                },
+                events: '/room_booking_data/',
+                }); 
+            
+            calendar.render();
+        });
+    </script>
+</head>
+
+<div class="dashboard-container">
+    <header class="dashboard-header">
+        <h1>Welcome to IRS - Intelligent Room System</h1>
+        <div class="user-info">
+            <span>Welcome, {{ request.user.username }}!</span>
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button class="logout-button" type="submit">Logout</button>
+            </form>
+        </div> 
+    </header>   
+<body>
+   
+    <h1>Room Bookings</h1>
+
+    <!-- Dropdown Menu to Select Room -->
+    <label for="room-select">Select Room:</label>
+    <select id="room-select">
+        {% for room in rooms %}
+        <option value="{{ room.id }}" {% if room.id == selected_room_id %}selected{% endif %}>
+            {{ room.name }}
+        </option>
+        {% endfor %}
+    </select>
+<br>
+<br>
+    
+<div id="calendar"></div>
+
+</body>
+
+<style>
+    body {
+               font-family: Arial, sans-serif;
+               margin: 0;
+               padding: 0;
+               background-color: #f5f5f5;
+           }
+   
+           .dashboard-container {
+               max-width: 1200px;
+               margin: 0 auto;
+               padding: 20px;
+           }
+   
+           .dashboard-header {
+               display: flex;
+               justify-content: space-between;
+               align-items: center;
+               margin-bottom: 40px;
+               padding: 20px;
+               background-color: white;
+               border-radius: 8px;
+               box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+           }
+   
+           .user-info {
+               display: flex;
+               align-items: center;
+               gap: 20px;
+           }
+   
+           .dashboard-options {
+               display: flex;
+               justify-content: center;
+               gap: 40px;
+               margin-top: 40px;
+           }
+   
+           .dashboard-card {
+               flex: 1;
+               max-width: 400px;
+               background: white;
+               padding: 30px;
+               border-radius: 8px;
+               box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+               text-align: center;
+           }
+   
+           .dashboard-card h2 {
+               color: #1e88e5;
+               margin-bottom: 15px;
+           }
+   
+           .dashboard-card p {
+               color: #666;
+               margin-bottom: 25px;
+           }
+   
+           .dashboard-button {
+               display: inline-block;
+               padding: 12px 24px;
+               background-color: #1e88e5;
+               color: white;
+               text-decoration: none;
+               border-radius: 4px;
+               transition: background-color 0.3s;
+           }
+   
+           .dashboard-button:hover {
+               background-color: #1565c0;
+           }
+   
+           .logout-button {
+               padding: 8px 16px;
+               background-color: #dc3545;
+               color: white;
+               text-decoration: none;
+               border-radius: 4px;
+               transition: background-color 0.3s;
+           }
+   
+           .logout-button:hover {
+               background-color: #c82333;
+           }
+   
+           @media (max-width: 768px) {
+               .dashboard-options {
+                   flex-direction: column;
+                   align-items: center;
+               }
+   
+               .dashboard-card {
+                   width: 100%;
+               }
+   
+               .dashboard-header {
+                   flex-direction: column;
+                   text-align: center;
+                   gap: 20px;
+               }
+           }
+   
+   </style>
+
+</html>

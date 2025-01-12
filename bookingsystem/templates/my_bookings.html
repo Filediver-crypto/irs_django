@@ -5,26 +5,18 @@
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar/index.global.min.js'></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const calendarEl = document.getElementById('calendar');
-            const calendar = new FullCalendar.Calendar(calendarEl, {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
-                events : [
-                    {title: "All Day Math",
-                        start: "2025-01-02"
-                    },
-                    {title: 'Meeting',
-                    start: '2025-01-12T10:30:00',
-                    end: '2025-01-12T12:30:00'
-                    },
-                ],
                 headerToolbar : {
                     left: "prev, next" ,
                     center: "title" ,
                     right: "dayGridMonth, timeGridWeek, listDay"
 
-                }
-                
-            });
+                },
+                events: '/user_booking-data/',
+                }); 
+            
             calendar.render();
         });
     </script>
@@ -48,7 +40,10 @@
     
     <div class="bookings-container">
         <h1>My Bookings</h1>
-        
+    
+        <br>            
+        <div id='calendar'></div>     
+        <br>
         {% if bookings %}
             <div class="bookings-list">
                 {% for booking in bookings %}
@@ -64,8 +59,7 @@
         {% else %}
             <p class="no-bookings">You haven't made any bookings yet.</p>
         {% endif %}
-<br>            
-        <div id='calendar'></div>  
+ 
 
         <div class="navigation-buttons">
             <a href="{% url 'dashboard' %}" class="nav-button">Back to Dashboard</a>
@@ -105,7 +99,7 @@
             gap: 20px;
         }
         .bookings-container {
-            max-width: 800px;
+            max-width: 1200px;
             margin: 40px auto;
             padding: 20px;
         }

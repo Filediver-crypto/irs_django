@@ -3,7 +3,7 @@ from .models import Booking, CustomUser, Room, Course
 
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
-    list_display = ('room_type', 'date', 'start_time', 'end_time', 'building', 'group_size', 'purpose')
+    list_display = ('room_type', 'date', 'start_time', 'end_time', 'building', 'group_size', 'purpose',"room_id")
     list_filter = ('date', 'room_type', 'building')
     search_fields = ('room_type', 'building', 'purpose')
     ordering = ('-date', 'start_time')
