@@ -58,7 +58,7 @@ def bookingsystem(request):
             end_time = request.POST['end_time']
             room_type = request.POST['room_type']
             building = request.POST['building']
-            group_size = int(request.POST['group_size'])
+            
             purpose = request.POST['purpose']
             course_id = request.POST.get('course')  # Optional course ID
             
@@ -78,21 +78,9 @@ def bookingsystem(request):
                     purpose=f"Course: {course.name}",
                     course=course
                 )
-
-                # Create bookings for all students in the course
-                for student in course.students.all():
-                    Booking.objects.create(
-                        user=student,
-                        date=date,
-                        start_time=start_time,
-                        end_time=end_time,
-                        room_type=room_type,
-                        building=building,
-                        group_size=1,
-                        purpose=f"Course: {course.name}",
-                        course=course
-                    )
+               
             else:
+                group_size = int(request.POST['group_size'])
                 # Create a standard booking for the user
                 booking = Booking.objects.create(
                     user=request.user,
@@ -149,14 +137,22 @@ def user_booking_data(request):
     # Provide JSON data for FullCalendar
     user_bookings = Booking.objects.filter(user=request.user)
 
+    # Fetch course-related bookings for courses the user is enrolled in
+    course_bookings = Booking.objects.filter(course__students=request.user)
+
+    # Combine both sets of bookings
+    all_bookings = user_bookings | course_bookings
+
     events = []
-    for booking in user_bookings:
+    for booking in all_bookings:
         events.append({
             "id": booking.id,
-            "title": f"{booking.room_type} ({booking.purpose})",
+            "title": f"{booking.purpose}",
             "start": f"{booking.date}T{booking.start_time}",
             "end": f"{booking.date}T{booking.end_time}",
             "allDay": False,
+            "backgroundColor": "red" if booking.course else "blue",
+            "borderColor": "red" if booking.course else "blue",
         })
 
     return JsonResponse(events, safe=False)
@@ -201,6 +197,7 @@ def room_booking_data(request):
             "start": f"{booking.date}T{booking.start_time}",
             "end": f"{booking.date}T{booking.end_time}",
             "allDay": False,
+            
         })
 
     return JsonResponse(events, safe=False)
