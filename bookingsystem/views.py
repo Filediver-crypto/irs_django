@@ -75,12 +75,7 @@ def bookingsystem(request):
             temppurpose=request.POST['purpose']
 
 
-            if isinstance(tempstart_time, str):
-                tempstart_time = datetime.strptime(tempstart_time, '%H:%M').time()
-
-            if isinstance(tempend_time, str):
-                tempend_time = datetime.strptime(tempend_time, '%H:%M').time()
-
+            
             
 
             if temproom_type == "individual" :
@@ -110,8 +105,8 @@ def bookingsystem(request):
                         
                         if bookingpossible == True :
 
-                            if buchung.start_time < tempstart_time <= buchung.end_time :
-                                if buchung.start_time <= tempend_time < buchung.end_time:
+                            if str(buchung.start_time) < str(tempstart_time) <= str(buchung.end_time) :
+                                if str(buchung.start_time) <= str(tempend_time) < str(buchung.end_time):
                                     bookingpossible = True
                                 else :
                                     bookingpossible = False
