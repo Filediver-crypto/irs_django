@@ -13,4 +13,6 @@ urlpatterns = [
     path('user_booking-data/', views.user_booking_data, name='user_booking-data'),
     path('room_plans/', views.room_plans, name='room_plans'),
     path('room_booking_data/', views.room_booking_data, name='room_booking_data'),
+    path('my-bookings/', views.my_bookings, name='my_bookings'),
+    path('booking-suggestion/', views.booking_suggestion, name='booking_suggestion'),
 ]

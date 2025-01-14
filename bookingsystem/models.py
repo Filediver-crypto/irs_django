@@ -28,8 +28,10 @@ class CustomUser(AbstractUser):
         return f'{next_number:03d}'
 
 class Room(models.Model):
+    room_id = models.IntegerField(default=1)
     name = models.CharField(max_length=100)  # Name of the room
     size = models.IntegerField()  # Maximum number of people
+    building = models.CharField(max_length=100, default = "a")  # Building of the Room
     isworkroom = models.BooleanField(default=False)
     utility = models.TextField(blank=True, null=True)  # Optional description
     #BUILDING_CHOICES = [
@@ -59,7 +61,7 @@ class Booking(models.Model):
     date = models.DateField()
     start_time = models.TimeField()  # New field for start time
     end_time = models.TimeField()    # New field for end time
-    room = models.ForeignKey(Room, on_delete=models.CASCADE, default=1)
+    room_id = models.ForeignKey(Room, on_delete=models.CASCADE, default=1)
     room_type = models.CharField(max_length=20)
     building = models.CharField(max_length=50)
     group_size = models.IntegerField()

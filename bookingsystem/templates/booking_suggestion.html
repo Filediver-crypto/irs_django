@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>IRS - Raumvorschläge</title>
+</head>
+<body>
+
+<div class="dashboard-container">
+    <header class="dashboard-header">
+        <h1>Raumvorschläge</h1>
+        <div class="user-info">
+            <span>Welcome, {{ request.user.username }}!</span>
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button class="logout-button" type="submit">Logout</button>
+            </form>
+        </div>
+    </header>
+
+    <div class="booking-form">
+        <h2>Vorgeschlagener Raum</h2>
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit" name="action" value="accept_suggestion" class="submit-btn">
+                Raumvorschlag von Raum {{ suggested_room_name }} annehmen
+            </button>
+        </form>
+
+        <p style="text-align: center; margin: 20px 0; font-size: 16px; color: #555;">
+            Oder suche dir einen anderen Raum aus:
+        </p>
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="selected_option">Raumauswahl:</label>
+                <select id="selected_option" name="selected_option" required>
+                    {% for room in options %}
+                        <option value="{{ room.id }}">{{ room.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" name="action" value="accept_dropdown" class="submit-btn">Annehmen</button>
+        </form>
+    </div>
+
+    <div class="navigation-buttons">
+        <a href="{% url 'dashboard' %}" class="nav-button">Back to Dashboard</a>
+        <a href="{% url 'my_bookings' %}" class="nav-button">View my Bookings</a>
+    </div>
+</div>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f5f5f5;
+    }
+
+    .dashboard-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 40px;
+        padding: 20px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .logout-button {
+        padding: 8px 16px;
+        background-color: #dc3545;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        transition: background-color 0.3s;
+    }
+
+    .logout-button:hover {
+        background-color: #c82333;
+    }
+
+    .booking-form {
+        max-width: 600px;
+        margin: 20px auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .form-group select {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background-color: white;
+    }
+
+    .submit-btn {
+        background-color: #1e88e5;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        width: 100%;
+    }
+
+    .submit-btn:hover {
+        background-color: #1565c0;
+    }
+
+    .nav-button {
+        padding: 10px 20px;
+        background-color: #1e88e5;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        display: inline-block;
+        margin: 10px 0;
+    }
+
+    .nav-button:hover {
+        background-color: #1565c0;
+    }
+
+    .navigation-buttons {
+        text-align: center;
+        margin-top: 30px;
+    }
+</style>
+
+</body>
+</html>
