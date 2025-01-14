@@ -45,6 +45,7 @@ def user_login(request):
 
 #BOOKINGSYSTEM
 
+@login_required
 def bookingsystem(request):
     # Time selection (hours and minutes)
     hours = range(8, 19)  # Hours from 8 AM to 6 PM
@@ -72,6 +73,13 @@ def bookingsystem(request):
             tempbuilding=request.POST['building']
             tempgroup_size=int(request.POST['group_size'])
             temppurpose=request.POST['purpose']
+
+
+            if isinstance(tempstart_time, str):
+                tempstart_time = datetime.strptime(tempstart_time, '%H:%M').time()
+
+            if isinstance(tempend_time, str):
+                tempend_time = datetime.strptime(tempend_time, '%H:%M').time()
 
             
 
@@ -129,10 +137,10 @@ def bookingsystem(request):
 
                 
                 for room in possiblerooms:
-                    buchungen = Booking.objects.filter(roomid=room.room_id)
+                    buchungen = Booking.objects.filter(room_id=room.room_id)
                     
                     
-                    step = timedelta(minutes=5)
+                    step = str(timedelta(minutes=5))
 
                     # Iteration von starttime bis endtime
                     current_time = tempstart_time
@@ -194,73 +202,73 @@ def bookingsystem(request):
     return render(request, 'bookingsystem.html', {
         'hours': hours,
         'minutes': minutes
-    })           
+    })      
 
-#BOOKING suggestion
+#Booking suggestion   
+  
 @login_required
 def booking_suggestion(request):
+    # Session-Daten abrufen
+    tempdata = request.session.get('tempdata', {})
+    listofpossiblerooms = request.session.get('listofpossiblerooms', [])
 
+    if not listofpossiblerooms:
+        return render(request, 'booking_suggestion.html', {
+            'error': 'Keine verfügbaren Räume gefunden.',
+            'options': []
+        })
 
-    tempdata = request.session.get('tempdata', {})  # Standardwert ist {} falls keine Daten vorhanden sind
-    listofpossiblerooms = request.session.get('listofpossiblerooms', [])  # Abrufen der Buchungen, Standardwert ist eine leere Liste
-    
-    print(tempdata)
-    print(listofpossiblerooms)
-
-    suggested_room_id = listofpossiblerooms.pop(0)
-
-
-    suggested_room= get_object_or_404(Room, id=suggested_room_id)
-
+    # Erster Raumvorschlag
+    suggested_room_id = listofpossiblerooms[0]
+    suggested_room = Room.objects.get(id=suggested_room_id)
     suggested_room_name = suggested_room.name
 
-    dropdown_rooms = listofpossiblerooms[1:]
-
-    tempdate = tempdata.get('date', '')  # Datum
-    tempstart_time = tempdata.get('start_time', '')  # Startzeit
-    tempend_time = tempdata.get('end_time', '')  # Endzeit
-    temproom_type = tempdata.get('room_type', '')  # Raumtyp
-    tempbuilding = tempdata.get('building', '')  # Gebäude
-    tempgroup_size = tempdata.get('group_size', 0)  # Gruppengröße (mit Defaultwert 0)
-    temppurpose = tempdata.get('purpose', '')  # Zweck
-
-    
-
-    options = dropdown_rooms
-
-    textforbutton = f"Der Raum {suggested_room_name} passt am Besten "
-    
-    if request.method == "POST2":
-        booking = Booking(
-                user=request.user,
-                date=tempdate,
-                start_time=tempstart_time,
-                end_time=tempend_time,
-                room_type=temproom_type,
-                building=tempbuilding,
-                group_size=tempgroup_size,
-                purpose=temppurpose
-            )
-        booking.save()
-        return redirect('my_bookings')
+    # Dropdown-Optionen: Abrufen der Room-Objekte
+    options = Room.objects.filter(id__in=listofpossiblerooms[1:])
 
     if request.method == 'POST':
-        # Das ausgewählte Item wird durch den POST-Request erhalten
-        selected_item = request.POST.get('selected_option', None)
-        
-        # Hier kannst du das ausgewählte Item weiterverarbeiten (z.B. in der Datenbank speichern oder eine Antwort anzeigen)
-        if selected_item:
-            # Zum Beispiel: Rückmeldung an den Benutzer
-            context = {'message': f"Du hast {selected_item} ausgewählt!"}
-            return render(request, 'booking_suggestion.html', context)
+        action = request.POST.get('action')
+        selected_option = request.POST.get('selected_option')
 
+        if action == 'accept_suggestion':
+            # Buchung für den vorgeschlagenen Raum
+            booking = Booking(
+                user=request.user,
+                date=tempdata['date'],
+                start_time=tempdata['start_time'],
+                end_time=tempdata['end_time'],
+                room_type=tempdata['room_type'],
+                building=tempdata['building'],
+                group_size=tempdata['group_size'],
+                purpose=tempdata['purpose'],
+                room_id=suggested_room  # Hier wird die Room-Instanz verwendet
+            )
+            booking.save()
+            return redirect('my_bookings')
 
-    
+        elif action == 'accept_dropdown' and selected_option:
+            # Buchung für die Auswahl aus dem Dropdown
+            room = Room.objects.get(id=selected_option)
 
+            booking = Booking(
+                user=request.user,
+                date=tempdata['date'],
+                start_time=tempdata['start_time'],
+                end_time=tempdata['end_time'],
+                room_type=tempdata['room_type'],
+                building=tempdata['building'],
+                group_size=tempdata['group_size'],
+                purpose=tempdata['purpose'],
+                room_id=room  # Hier wird die Room-Instanz verwendet
+            )
+            booking.save()
+            return redirect('my_bookings')
 
+    return render(request, 'booking_suggestion.html', {
+        'suggested_room_name': suggested_room_name,
+        'options': options
+    })
 
-    # Wenn der POST-Request nicht vorliegt, wird das Dropdown angezeigt
-    return render(request, 'booking_suggestion.html', {'options': options})
 
 #DASHBOARD
 

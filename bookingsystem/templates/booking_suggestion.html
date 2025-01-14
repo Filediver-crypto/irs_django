@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>IRS - Bookingsystem</title>
+    <title>IRS - Raumvorschläge</title>
 </head>
 <body>
 
 <div class="dashboard-container">
     <header class="dashboard-header">
-        <h1>Welcome to IRS - Intelligent Room System</h1>
+        <h1>Raumvorschläge</h1>
         <div class="user-info">
             <span>Welcome, {{ request.user.username }}!</span>
             <form method="post" action="{% url 'logout' %}">
@@ -16,129 +16,83 @@
             </form>
         </div>
     </header>
-   
 
-<div class="booking-form">
-    <form method="POST2">
-        {% csrf_token %}
-        <button type="submit">Aktion ausführen</button>
-    </form>
+    <div class="booking-form">
+        <h2>Vorgeschlagener Raum</h2>
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit" name="action" value="accept_suggestion" class="submit-btn">
+                Raumvorschlag von Raum {{ suggested_room_name }} annehmen
+            </button>
+        </form>
 
-    <form method="POST">
-        {% csrf_token %}
-        <label for="dropdown">Option auswählen:</label>
-        <select name="selected_option" id="dropdown">
-            {% for option in options %}
-                <option value="{{ option }}">{{ option }}</option>
-            {% endfor %}
-        </select>
-        
-        <button type="submit">Bestätigen</button>
-    </form>
+        <p style="text-align: center; margin: 20px 0; font-size: 16px; color: #555;">
+            Oder suche dir einen anderen Raum aus:
+        </p>
 
-    {% if message %}
-        <p>{{ message }}</p> <!-- Wenn eine Auswahl getroffen wurde, wird eine Bestätigung angezeigt -->
-    {% endif %}
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="selected_option">Raumauswahl:</label>
+                <select id="selected_option" name="selected_option" required>
+                    {% for room in options %}
+                        <option value="{{ room.id }}">{{ room.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" name="action" value="accept_dropdown" class="submit-btn">Annehmen</button>
+        </form>
+    </div>
 
-    <script>
-        function addbooking() {
-            
-            fetch('/book', {
-                method: 'POST',
-                body: JSON.stringify(booking),
-            })
-        }
-    </script>
-<br>
-<br>
-
-<div class="navigation-buttons">
-    <a href="{% url 'dashboard' %}" class="nav-button">Back to Dashboard</a>
-    <a href="{% url 'my_bookings' %}" class="nav-button">View my Bookings</a>
+    <div class="navigation-buttons">
+        <a href="{% url 'dashboard' %}" class="nav-button">Back to Dashboard</a>
+        <a href="{% url 'my_bookings' %}" class="nav-button">View my Bookings</a>
+    </div>
 </div>
 
 <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f5f5f5;
-        }
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f5f5f5;
+    }
 
-        .dashboard-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+    .dashboard-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
 
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
-            padding: 20px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 40px;
+        padding: 20px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
 
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
 
-        .logout-button {
-            padding: 8px 16px;
-            background-color: #dc3545;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            transition: background-color 0.3s;
-        }
+    .logout-button {
+        padding: 8px 16px;
+        background-color: #dc3545;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        transition: background-color 0.3s;
+    }
 
-        .logout-button:hover {
-            background-color: #c82333;
-        }
-
-        @media (max-width: 768px) {
-            .dashboard-options {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .dashboard-card {
-                width: 100%;
-            }
-
-            .dashboard-header {
-                flex-direction: column;
-                text-align: center;
-                gap: 20px;
-            }
-        }
-        .dashboard-options {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin-top: 40px;
-        }
-
-        .dashboard-card {
-            flex: 1;
-            max-width: 400px;
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-
-        .dashboard-card h2 {
-            color: #1e88e5;
-            margin-bottom: 15px;
-        }
-
+    .logout-button:hover {
+        background-color: #c82333;
+    }
 
     .booking-form {
         max-width: 600px;
@@ -160,7 +114,6 @@
         color: #333;
     }
 
-    .form-group input,
     .form-group select {
         width: 100%;
         padding: 8px;
@@ -185,19 +138,24 @@
     }
 
     .nav-button {
-            padding: 10px 20px;
-            background-color: #1e88e5;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-        }
+        padding: 10px 20px;
+        background-color: #1e88e5;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        display: inline-block;
+        margin: 10px 0;
+    }
 
-        .dashboard-button:hover {
-            background-color: #1565c0;
-        }
+    .nav-button:hover {
+        background-color: #1565c0;
+    }
 
-
+    .navigation-buttons {
+        text-align: center;
+        margin-top: 30px;
+    }
 </style>
 
 </body>
-</html> 
+</html>
