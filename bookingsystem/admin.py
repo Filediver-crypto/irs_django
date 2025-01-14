@@ -23,3 +23,5 @@ class RoomAdmin(admin.ModelAdmin):
 class CourseAdmin(admin.ModelAdmin):
     list_display = ('name', 'dozent')
     search_fields = ('name', 'dozent')
+    filter_horizontal = ('students',)
+    

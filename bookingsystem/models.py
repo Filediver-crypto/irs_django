@@ -44,6 +44,16 @@ class Room(models.Model):
     def __str__(self):
         return f"{self.name} - {self.size} - {self.isworkroom} - {self.utility}"
 
+class Course(models.Model):
+    name = models.CharField(max_length=100) 
+    dozent = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    students = models.ManyToManyField(CustomUser, related_name='courses')
+    
+    
+    def __str__(self):
+        return f"{self.name} - {self.dozent} - {self.students.count()} students"
+
+
 class Booking(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     date = models.DateField()
@@ -54,20 +64,18 @@ class Booking(models.Model):
     building = models.CharField(max_length=50)
     group_size = models.IntegerField()
     purpose = models.CharField(max_length=50)
+    course = models.ForeignKey('Course', null=True, blank=True, on_delete=models.SET_NULL)
+    #For the Fullcalendar format
     title = f"{room.name} ({purpose})"
     start = f"{date}T{start_time}"
     end = f"{date}T{end_time}"
 
+
     def __str__(self):
+        if self.course:
+            return f"Course Booking: {self.course.name} on {self.date} ({self.start_time} - {self.end_time})"
         return f"{self.room_type} - {self.room.name} - {self.date} - {self.start_time} - {self.end_time}"
 
     
-class Course(models.Model):
-    name = models.CharField(max_length=100) 
-    dozent = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    students = models.ManyToManyField(CustomUser, related_name='courses')
-    
-    
-    def __str__(self):
-        return f"{self.name} - {self.dozent} - {self.students}"
+
     

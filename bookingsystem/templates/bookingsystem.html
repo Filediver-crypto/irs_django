@@ -81,10 +81,7 @@
             </select>
         </div>
 
-        <div class="form-group">
-            <label for="group-size">Number of Students:</label>
-            <input type="number" id="group-size" name="group_size" min="1" max="8" required>
-        </div>
+
 
         
        
@@ -99,6 +96,23 @@
                 <option value="other">Other</option>
             </select>
         </div>
+        <!-- Only display this block if the user is a professor -->
+        {% if request.user.is_professor %}
+        <div class="form-group">
+            <label for="course">Course (Optional):</label>
+            <select name="course" id="course">
+                <option value="">None</option>
+                {% for course in courses %}
+                <option value="{{ course.id }}">{{ course.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% else %}
+        <div class="form-group">
+            <label for="group-size">Number of Students:</label>
+            <input type="number" id="group-size" name="group_size" min="1" max="8" required>
+        </div>
+        {% endif %}
 
         <button type="submit" class="submit-btn">Book Room</button>
     </form>

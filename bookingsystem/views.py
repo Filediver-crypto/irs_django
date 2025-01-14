@@ -4,7 +4,7 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from .forms import CustomUserCreationForm, CustomAuthenticationForm
-from .models import Booking, Room
+from .models import Booking, Room, Course
 import json
 
 #LOGIN AND REGISTER
@@ -46,34 +46,83 @@ def bookingsystem(request):
     hours = range(8, 19)  # Hours from 8 AM to 6 PM
     minutes = range(0, 60, 5)  # Minutes from 00 to 55 in 5-minute intervals
     
+    # Fetch all courses for professors to select from
+    courses = Course.objects.all()
+
     # Handle form submission
     if request.method == 'POST':
         try:
-            # Create a new booking object with current user and form data
-            booking = Booking(
-                user=request.user,
-                date=request.POST['date'],
-                start_time=request.POST['start_time'],
-                end_time=request.POST['end_time'],
-                room_type=request.POST['room_type'],
-                building=request.POST['building'],
-                group_size=int(request.POST['group_size']),
-                purpose=request.POST['purpose']
-            )
-            booking.save()
+            # Extract form data
+            date = request.POST['date']
+            start_time = request.POST['start_time']
+            end_time = request.POST['end_time']
+            room_type = request.POST['room_type']
+            building = request.POST['building']
+            group_size = int(request.POST['group_size'])
+            purpose = request.POST['purpose']
+            course_id = request.POST.get('course')  # Optional course ID
+            
+            # Check if the user is a professor and a course is selected
+            if request.user.is_professor and course_id:
+                course = Course.objects.get(id=course_id)
+
+                # Create a booking for the professor
+                booking = Booking.objects.create(
+                    user=request.user,
+                    date=date,
+                    start_time=start_time,
+                    end_time=end_time,
+                    room_type=room_type,
+                    building=building,
+                    group_size=course.students.count(),  # Group size = total students in course
+                    purpose=f"Course: {course.name}",
+                    course=course
+                )
+
+                # Create bookings for all students in the course
+                for student in course.students.all():
+                    Booking.objects.create(
+                        user=student,
+                        date=date,
+                        start_time=start_time,
+                        end_time=end_time,
+                        room_type=room_type,
+                        building=building,
+                        group_size=1,
+                        purpose=f"Course: {course.name}",
+                        course=course
+                    )
+            else:
+                # Create a standard booking for the user
+                booking = Booking.objects.create(
+                    user=request.user,
+                    date=date,
+                    start_time=start_time,
+                    end_time=end_time,
+                    room_type=room_type,
+                    building=building,
+                    group_size=group_size,
+                    purpose=purpose
+                )
+            
             return redirect('dashboard')  # Redirect to a dashboard or success page
+
         except Exception as e:
             print(f"Booking error: {e}")
             return render(request, 'bookingsystem.html', {
                 'error': 'Booking failed. Please try again.',
                 'hours': hours,
-                'minutes': minutes
+                'minutes': minutes,
+                'courses': courses
             })
- # If it's a GET request, just render the booking form with the time selection options
+
+    # If it's a GET request, render the booking form with the time selection options and courses
     return render(request, 'bookingsystem.html', {
         'hours': hours,
-        'minutes': minutes
+        'minutes': minutes,
+        'courses': courses
     })
+
 
 
 
