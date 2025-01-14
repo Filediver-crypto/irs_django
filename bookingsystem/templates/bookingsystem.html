@@ -56,7 +56,10 @@
             </select>
         </div>
         
-        
+        <div class="form-group">
+            <label for="group-size">Number of Students:</label>
+            <input type="number" id="group-size" name="group_size" min="1" max="8" required>
+        </div>
 
         <div class="form-group">
             <label for="room-type">Room Type:</label>
@@ -70,18 +73,10 @@
         <div class="form-group">
             <label for="building">Building:</label>
             <select id="building" name="building" required>
-<<<<<<< HEAD
-                <option value="">Select a building</option>
-                <option value="A">Gebäude A</option>
-                <option value="B">Gebäude B</option>
-                <option value="C">Gebäude C</option>
-                <option value="D">Gebäude D</option>
-=======
                 <option value="">-- Select a building --</option>
                 <option value="a">Building A | Maschinenbau und Verfahrenstechnik</option>
                 <option value="b">Building B | Angewandte Geistes- und Naturwissenschaften</option>
                 <option value="c">Building C | Architektur und Bauwesen</option>
->>>>>>> branch-moritz
             </select>
         </div>
 
@@ -110,12 +105,7 @@
                 <option value="{{ course.id }}">{{ course.name }}</option>
                 {% endfor %}
             </select>
-        </div>
-        {% else %}
-        <div class="form-group">
-            <label for="group-size">Number of Students:</label>
-            <input type="number" id="group-size" name="group_size" min="1" max="8" required>
-        </div>
+        </div>        
         {% endif %}
 
         <button type="submit" class="submit-btn">Book Room</button>

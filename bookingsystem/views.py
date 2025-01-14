@@ -4,15 +4,11 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from .forms import CustomUserCreationForm, CustomAuthenticationForm
-<<<<<<< HEAD
 from .models import Booking, Room, Course
-=======
-from .models import Booking, Room
 from django.db.models import Q
 from datetime import datetime, timedelta
 from django.shortcuts import render, redirect
 from django.shortcuts import render, get_object_or_404
->>>>>>> branch-moritz
 import json
 
 #LOGIN AND REGISTER
@@ -55,6 +51,9 @@ def bookingsystem(request):
     hours = range(8, 19)  # Hours from 8 AM to 6 PM
     minutes = range(0, 60, 5)  # Minutes from 00 to 55 in 5-minute intervals
 
+    courses = Course.objects.all()
+
+
     listofpossiblerooms = []
 
     tempdate=None
@@ -65,72 +64,9 @@ def bookingsystem(request):
     tempgroup_size=None
     temppurpose=None
     
-    # Fetch all courses for professors to select from
-    courses = Course.objects.all()
-
     # Handle form submission
     if request.method == 'POST':
         try:
-<<<<<<< HEAD
-            # Extract form data
-            date = request.POST['date']
-            start_time = request.POST['start_time']
-            end_time = request.POST['end_time']
-            room_type = request.POST['room_type']
-            building = request.POST['building']
-            
-            purpose = request.POST['purpose']
-            course_id = request.POST.get('course')  # Optional course ID
-            
-            # Check if the user is a professor and a course is selected
-            if request.user.is_professor and course_id:
-                course = Course.objects.get(id=course_id)
-
-                # Create a booking for the professor
-                booking = Booking.objects.create(
-                    user=request.user,
-                    date=date,
-                    start_time=start_time,
-                    end_time=end_time,
-                    room_type=room_type,
-                    building=building,
-                    group_size=course.students.count(),  # Group size = total students in course
-                    purpose=f"Course: {course.name}",
-                    course=course
-                )
-               
-            else:
-                group_size = int(request.POST['group_size'])
-                # Create a standard booking for the user
-                booking = Booking.objects.create(
-                    user=request.user,
-                    date=date,
-                    start_time=start_time,
-                    end_time=end_time,
-                    room_type=room_type,
-                    building=building,
-                    group_size=group_size,
-                    purpose=purpose
-                )
-            
-            return redirect('dashboard')  # Redirect to a dashboard or success page
-
-        except Exception as e:
-            print(f"Booking error: {e}")
-            return render(request, 'bookingsystem.html', {
-                'error': 'Booking failed. Please try again.',
-                'hours': hours,
-                'minutes': minutes,
-                'courses': courses
-            })
-
-    # If it's a GET request, render the booking form with the time selection options and courses
-    return render(request, 'bookingsystem.html', {
-        'hours': hours,
-        'minutes': minutes,
-        'courses': courses
-    })
-=======
 
 
             tempdate=request.POST['date']
@@ -140,122 +76,230 @@ def bookingsystem(request):
             tempbuilding=request.POST['building']
             tempgroup_size=int(request.POST['group_size'])
             temppurpose=request.POST['purpose']
-
-
-            if isinstance(tempstart_time, str):
-                tempstart_time = datetime.strptime(tempstart_time, '%H:%M').time()
-
-            if isinstance(tempend_time, str):
-                tempend_time = datetime.strptime(tempend_time, '%H:%M').time()
-
+            tempcourse_id = request.POST.get('course')  # Optional course ID
             
+            if request.user.is_professor:
+                course = Course.objects.get(id=tempcourse_id)
 
-            if temproom_type == "individual" :
+                temppurpose = f"Course: {course.name}"
 
-                possiblerooms = Room.objects.filter(building=tempbuilding, size__gte=tempgroup_size, isworkroom =False) 
+                if temproom_type == "individual" :
 
-                
+                    possiblerooms = Room.objects.filter(building=tempbuilding, size__gte=tempgroup_size, isworkroom =False) 
 
-                #Algorythem if the room is free in this Time
-
-
-                bookingpossible = True
-
-                print("Ist das hier zu sehen")
-                print(tempbuilding)
-                print(tempgroup_size)
-                print(possiblerooms)
-                
-                for room in possiblerooms:
-                    buchungen = Booking.objects.filter(room_id=room.room_id)
                     
-                    print("Raum" + str(room.room_id) + " wird untersucht")
+
+                    #Algorythem if the room is free in this Time
+
 
                     bookingpossible = True
 
-                    for buchung in buchungen:
+                    print("Ist das hier zu sehen")
+                    print(tempbuilding)
+                    print(tempgroup_size)
+                    print(possiblerooms)
+                    
+                    for room in possiblerooms:
+                        buchungen = Booking.objects.filter(room_id=room.room_id)
                         
-                        if bookingpossible == True :
+                        print("Raum" + str(room.room_id) + " wird untersucht")
 
-                            if buchung.start_time < tempstart_time <= buchung.end_time :
-                                if buchung.start_time <= tempend_time < buchung.end_time:
-                                    bookingpossible = True
-                                else :
-                                    bookingpossible = False
-                            else:
-                                bookingpossible = False
-                                
-                        else :
-                            break
-
-                    
-                    if bookingpossible == True :
-                        listofpossiblerooms.append(room.room_id)
-
-
-            elif temproom_type == "sharedroom":
-
-                #Algorythem if in the Rooms seats are Emty
-
-                possiblerooms = Room.objects.filter(building=tempbuilding, size__gte=tempgroup_size, isworkroom =True) 
-
-
-                bookingpossible = True
-
-                
-                for room in possiblerooms:
-                    buchungen = Booking.objects.filter(room_id=room.room_id)
-                    
-                    
-                    step = str(timedelta(minutes=5))
-
-                    # Iteration von starttime bis endtime
-                    current_time = tempstart_time
-                    while current_time <= tempend_time:
-
-                        peopleinroom = 0
+                        bookingpossible = True
 
                         for buchung in buchungen:
-
-                            buchungssize = buchung.group_size 
-
-                            if buchung.start_time <= current_time < buchung.end_time :
-                                    peopleinroom = peopleinroom + buchungssize
-                                    
                             
-                        if not peopleinroom <= room.size :
-                            bookingpossible = False
-                            break
-                          
-                        current_time += step
+                            if bookingpossible == True :
+
+                                if str(buchung.start_time) < str(tempstart_time) <= str(buchung.end_time) :
+                                    if str(buchung.start_time) <= str(tempend_time) < str(buchung.end_time):
+                                        bookingpossible = True
+                                    else :
+                                        bookingpossible = False
+                                else:
+                                    bookingpossible = False
+                                    
+                            else :
+                                break
+
+                        
+                        if bookingpossible == True :
+                            listofpossiblerooms.append(room.room_id)
+
+
+                elif temproom_type == "sharedroom":
+
+                    #Algorythem if in the Rooms seats are Emty
+
+                    possiblerooms = Room.objects.filter(building=tempbuilding, size__gte=tempgroup_size, isworkroom =True) 
+
+
+                    bookingpossible = True
+
+                    
+                    for room in possiblerooms:
+                        buchungen = Booking.objects.filter(room_id=room.room_id)
+                        
+                        
+                        step = str(timedelta(minutes=5))
+
+                        # Iteration von starttime bis endtime
+                        current_time = tempstart_time
+                        while current_time <= tempend_time:
+
+                            peopleinroom = 0
+
+                            for buchung in buchungen:
+
+                                buchungssize = buchung.group_size 
+
+                                if buchung.start_time <= current_time < buchung.end_time :
+                                        peopleinroom = peopleinroom + buchungssize
+                                        
+                                
+                            if not peopleinroom <= room.size :
+                                bookingpossible = False
+                                break
+                            
+                            current_time += step
+                        
+
+
+
+    
+                        if bookingpossible == True :
+                            listofpossiblerooms.append(room.room_id)
+                
+                print(listofpossiblerooms)
+
+                request.session['tempdata'] = {
+                'date': tempdate,
+                'start_time': tempstart_time,
+                'end_time': tempend_time,
+                'room_type': temproom_type,
+                'building': tempbuilding,
+                'group_size': course.students.count(),
+                'purpose': temppurpose,
+                'course': course,
+            }
+
+                request.session['listofpossiblerooms'] = listofpossiblerooms
+
+
+                request.session.save()
+
+                
+
+                return redirect('booking_suggestion')  # Redirect to a dashboard or success page
+
+
+            elif not request.user.is_professor:
+                
+                if temproom_type == "individual" :
+
+                    possiblerooms = Room.objects.filter(building=tempbuilding, size__gte=tempgroup_size, isworkroom =False) 
+
                     
 
+                    #Algorythem if the room is free in this Time
 
 
-   
-                    if bookingpossible == True :
-                        listofpossiblerooms.append(room.room_id)
-            
-            print(listofpossiblerooms)
+                    bookingpossible = True
 
-            request.session['tempdata'] = {
-            'date': tempdate,
-            'start_time': tempstart_time,
-            'end_time': tempend_time,
-            'room_type': temproom_type,
-            'building': tempbuilding,
-            'group_size': tempgroup_size,
-            'purpose': temppurpose,
-        }
+                    print("Ist das hier zu sehen")
+                    print(tempbuilding)
+                    print(tempgroup_size)
+                    print(possiblerooms)
+                    
+                    for room in possiblerooms:
+                        buchungen = Booking.objects.filter(room_id=room.room_id)
+                        
+                        print("Raum" + str(room.room_id) + " wird untersucht")
 
-            request.session['listofpossiblerooms'] = listofpossiblerooms
+                        bookingpossible = True
+
+                        for buchung in buchungen:
+                            
+                            if bookingpossible == True :
+
+                                if str(buchung.start_time) < str(tempstart_time) <= str(buchung.end_time) :
+                                    if str(buchung.start_time) <= str(tempend_time) < str(buchung.end_time):
+                                        bookingpossible = True
+                                    else :
+                                        bookingpossible = False
+                                else:
+                                    bookingpossible = False
+                                    
+                            else :
+                                break
+
+                        
+                        if bookingpossible == True :
+                            listofpossiblerooms.append(room.room_id)
 
 
-            request.session.save()
+                elif temproom_type == "sharedroom":
 
-            
+                    #Algorythem if in the Rooms seats are Emty
 
-            return redirect('booking_suggestion')  # Redirect to a dashboard or success page
+                    possiblerooms = Room.objects.filter(building=tempbuilding, size__gte=tempgroup_size, isworkroom =True) 
+
+
+                    bookingpossible = True
+
+                    
+                    for room in possiblerooms:
+                        buchungen = Booking.objects.filter(room_id=room.room_id)
+                        
+                        
+                        step = str(timedelta(minutes=5))
+
+                        # Iteration von starttime bis endtime
+                        current_time = tempstart_time
+                        while current_time <= tempend_time:
+
+                            peopleinroom = 0
+
+                            for buchung in buchungen:
+
+                                buchungssize = buchung.group_size 
+
+                                if buchung.start_time <= current_time < buchung.end_time :
+                                        peopleinroom = peopleinroom + buchungssize
+                                        
+                                
+                            if not peopleinroom <= room.size :
+                                bookingpossible = False
+                                break
+                            
+                            current_time += step
+                        
+
+
+
+    
+                        if bookingpossible == True :
+                            listofpossiblerooms.append(room.room_id)
+                
+                print(listofpossiblerooms)
+
+                request.session['tempdata'] = {
+                'date': tempdate,
+                'start_time': tempstart_time,
+                'end_time': tempend_time,
+                'room_type': temproom_type,
+                'building': tempbuilding,
+                'group_size': tempgroup_size,
+                'purpose': temppurpose,
+            }
+
+                request.session['listofpossiblerooms'] = listofpossiblerooms
+
+
+                request.session.save()
+
+                
+
+                return redirect('booking_suggestion')  # Redirect to a dashboard or success page
         
 
         except Exception as e:
@@ -263,14 +307,15 @@ def bookingsystem(request):
                     return render(request, 'bookingsystem.html', {
                         'error': 'Booking failed. Please try again.',
                         'hours': hours,
-                        'minutes': minutes
+                        'minutes': minutes,
+                        'courses': courses
                     })       
 
     return render(request, 'bookingsystem.html', {
         'hours': hours,
-        'minutes': minutes
+        'minutes': minutes,
+        'courses': courses
     })      
->>>>>>> branch-moritz
 
 #Booking suggestion   
   
@@ -294,49 +339,92 @@ def booking_suggestion(request):
     # Dropdown-Optionen: Abrufen der Room-Objekte
     options = Room.objects.filter(id__in=listofpossiblerooms[1:])
 
-    if request.method == 'POST':
-        action = request.POST.get('action')
-        selected_option = request.POST.get('selected_option')
 
-        if action == 'accept_suggestion':
-            # Buchung für den vorgeschlagenen Raum
-            booking = Booking(
-                user=request.user,
-                date=tempdata['date'],
-                start_time=tempdata['start_time'],
-                end_time=tempdata['end_time'],
-                room_type=tempdata['room_type'],
-                building=tempdata['building'],
-                group_size=tempdata['group_size'],
-                purpose=tempdata['purpose'],
-                room_id=suggested_room  # Hier wird die Room-Instanz verwendet
-            )
-            booking.save()
-            return redirect('my_bookings')
+    if request.user.is_professor:
+        if request.method == 'POST':
+            action = request.POST.get('action')
+            selected_option = request.POST.get('selected_option')
 
-        elif action == 'accept_dropdown' and selected_option:
-            # Buchung für die Auswahl aus dem Dropdown
-            room = Room.objects.get(id=selected_option)
+            if action == 'accept_suggestion':
+                # Buchung für den vorgeschlagenen Raum
+                booking = Booking(
+                    user=request.user,
+                    date=tempdata['date'],
+                    start_time=tempdata['start_time'],
+                    end_time=tempdata['end_time'],
+                    room_type=tempdata['room_type'],
+                    building=tempdata['building'],
+                    group_size=tempdata['group_size'],
+                    purpose=tempdata['purpose'],
+                    course=tempdata['course'],
+                    room_id=suggested_room  # Hier wird die Room-Instanz verwendet
+                )
+                booking.save()
+                return redirect('my_bookings')
 
-            booking = Booking(
-                user=request.user,
-                date=tempdata['date'],
-                start_time=tempdata['start_time'],
-                end_time=tempdata['end_time'],
-                room_type=tempdata['room_type'],
-                building=tempdata['building'],
-                group_size=tempdata['group_size'],
-                purpose=tempdata['purpose'],
-                room_id=room  # Hier wird die Room-Instanz verwendet
-            )
-            booking.save()
-            return redirect('my_bookings')
+            elif action == 'accept_dropdown' and selected_option:
+                # Buchung für die Auswahl aus dem Dropdown
+                room = Room.objects.get(id=selected_option)
+
+                booking = Booking(
+                    user=request.user,
+                    date=tempdata['date'],
+                    start_time=tempdata['start_time'],
+                    end_time=tempdata['end_time'],
+                    room_type=tempdata['room_type'],
+                    building=tempdata['building'],
+                    group_size=tempdata['group_size'],
+                    purpose=tempdata['purpose'],
+                    course=tempdata['course'],
+                    room_id=room  # Hier wird die Room-Instanz verwendet
+                )
+                booking.save()
+                return redirect('my_bookings') 
+
+    elif not request.user.is_professor:
+        if request.method == 'POST':
+            action = request.POST.get('action')
+            selected_option = request.POST.get('selected_option')
+
+            if action == 'accept_suggestion':
+                # Buchung für den vorgeschlagenen Raum
+                booking = Booking(
+                    user=request.user,
+                    date=tempdata['date'],
+                    start_time=tempdata['start_time'],
+                    end_time=tempdata['end_time'],
+                    room_type=tempdata['room_type'],
+                    building=tempdata['building'],
+                    group_size=tempdata['group_size'],
+                    purpose=tempdata['purpose'],
+                    room_id=suggested_room  # Hier wird die Room-Instanz verwendet
+                )
+                booking.save()
+                return redirect('my_bookings')
+
+            elif action == 'accept_dropdown' and selected_option:
+                # Buchung für die Auswahl aus dem Dropdown
+                room = Room.objects.get(id=selected_option)
+
+                booking = Booking(
+                    user=request.user,
+                    date=tempdata['date'],
+                    start_time=tempdata['start_time'],
+                    end_time=tempdata['end_time'],
+                    room_type=tempdata['room_type'],
+                    building=tempdata['building'],
+                    group_size=tempdata['group_size'],
+                    purpose=tempdata['purpose'],
+                    room_id=room  # Hier wird die Room-Instanz verwendet
+                )
+                booking.save()
+                return redirect('my_bookings') 
+    
 
     return render(request, 'booking_suggestion.html', {
         'suggested_room_name': suggested_room_name,
         'options': options
     })
-
 
 
 #DASHBOARD
@@ -426,6 +514,3 @@ def room_booking_data(request):
         })
 
     return JsonResponse(events, safe=False)
-
-
-
