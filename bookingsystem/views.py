@@ -179,7 +179,7 @@ def bookingsystem(request):
                 'building': tempbuilding,
                 'group_size': course.students.count(),
                 'purpose': temppurpose,
-                'course': course,
+                'course_id': course.id if course else None,
             }
 
                 request.session['listofpossiblerooms'] = listofpossiblerooms
@@ -324,6 +324,7 @@ def booking_suggestion(request):
     # Session-Daten abrufen
     tempdata = request.session.get('tempdata', {})
     listofpossiblerooms = request.session.get('listofpossiblerooms', [])
+    tempcourse = Course.objects.get(id=tempdata['course_id']) if 'course_id' in tempdata else None
 
     if not listofpossiblerooms:
         return render(request, 'booking_suggestion.html', {
@@ -356,7 +357,7 @@ def booking_suggestion(request):
                     building=tempdata['building'],
                     group_size=tempdata['group_size'],
                     purpose=tempdata['purpose'],
-                    course=tempdata['course'],
+                    course=tempcourse,
                     room_id=suggested_room  # Hier wird die Room-Instanz verwendet
                 )
                 booking.save()
