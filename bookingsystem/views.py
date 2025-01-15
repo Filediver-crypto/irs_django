@@ -263,7 +263,7 @@ def bookingsystem(request):
 
                                 buchungssize = buchung.group_size 
 
-                                if buchung.start_time <= current_time < buchung.end_time :
+                                if str(buchung.start_time) <= str(current_time) < str(buchung.end_time) :
                                         peopleinroom = peopleinroom + buchungssize
                                         
                                 
