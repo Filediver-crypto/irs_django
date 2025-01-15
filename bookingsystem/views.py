@@ -482,34 +482,44 @@ def room_plans(request):
     # Get the selected room from the request (default to the first room)
     selected_room_id = request.GET.get('room_id', rooms.first().id if rooms else None)
 
+    print(str(selected_room_id))
+
     # Pass the rooms and selected room to the template
     context = {
         'rooms': rooms,
         'selected_room_id': int(selected_room_id) if selected_room_id else None,
     }
+    print(str(context))
+   
+
     return render(request, 'room_plans.html', context)
 
 
 @login_required
 def room_booking_data(request):
+    rooms = Room.objects.all()
     # Get the room ID from the request parameters
-    room_id = request.GET.get('room_id')
-
+    room_id = request.GET.get('room_id', rooms.first().id if rooms else None)
+    
     # Fetch all bookings for the selected room
     if room_id:
-        bookings = Booking.objects.filter(room_id=room_id)
+        bookings = Booking.objects.filter(room_id_id=room_id)
+        #print("I got here")
     else:
         bookings = []
+        print("I got there")
 
     # Format data for FullCalendar
     events = []
     for booking in bookings:
         events.append({
             "id": booking.id,
-            "title": f"{booking.room_type} ({booking.purpose})",
+            "title": f"{booking.purpose}",
             "start": f"{booking.date}T{booking.start_time}",
             "end": f"{booking.date}T{booking.end_time}",
             "allDay": False,
+            "backgroundColor": "red" if booking.course else "blue",
+            "borderColor": "red" if booking.course else "blue",
             
         })
 
